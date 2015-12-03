@@ -1,0 +1,72 @@
+	<html data-ng-app="empApp">
+	  <head>
+	    <meta charset="utf-8">
+	    <title>AngularJS JSON Fetching Example</title>
+	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+	    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+	    <script>
+	    
+	      var empApp = angular.module('empApp', []);
+	      empApp.controller('EmpCtrl', function ($scope, $http){
+		      $scope.employees = [];
+		      
+		      //Get list of Employees        
+	          $scope.getEmp=function(){
+	      		  $http.get('http://localhost:8080/RestClient1/getList').success(function(data){
+	      		  $scope.employees = data.employeeList; });
+	      	  };
+		      		      
+		      //Insert Employee
+	      	  $scope.addEmp=function(){
+	      	  	  
+	      	  	  $scope.employees.push({'id':$scope.userId, 'name':$scope.userName});
+	      	  	  var empObj = { id : $scope.userId, 
+	      	  	  				 name : $scope.userName
+	      	  	  			   };
+	      	  	  var res = $http.post('http://localhost:8080/RestClient1/post', empObj);
+	      	  	  res.success(function (data, status, headers, config){
+	      	  	  		$scope.message=data;
+	      	  	  });
+	      	  	  res.error(function (data, status, headers, config){
+	      	  	  		alert("failure message : " + JSON.stringify({data:data}));
+	      	  	  });
+	      	  	  //Making the fields empty
+	      	  	  $scope.userId = '';
+	      	  	  $scope.userName = '';
+	      	  };
+	      	  
+	       });
+	      	   	      	      
+	    </script>
+	    <style>
+			table, th , td  {
+  				border: 1px solid grey;
+  				border-collapse: collapse;
+  				padding: 5px;
+			}
+			table tr:nth-child(odd)	{
+  				background-color: #f1f1f1;
+			}
+			table tr:nth-child(even) {
+  				background-color: #ffffff;
+			}
+		</style>
+	  </head>
+	  <body data-ng-controller="EmpCtrl">
+	    <h2>Employee Details</h2>
+	    	Emp ID   : <input type="text" data-ng-model="userId" size="20"><br>
+	    	Emp Name : <input type="text" data-ng-model="userName" size="20"><br>
+        	<button data-ng-click ="addEmp()"> Add Employee </button><br><br>
+            <button data-ng-click ="getEmp()"> List all Employees </button><br><br>
+		   <table>
+		      <tr>
+		        <th>Employee ID</th>
+		        <th>Employee Name</th>
+		      </tr>
+		      <tr data-ng-repeat="employee in employees | orderBy: 'id' ">
+		        <td>{{employee.id}}</td>
+		        <td>{{employee.name}}</td>
+		      </tr>
+		    </table>
+	  </body>
+	</html>
